@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres
+    volumes:
+      # PostgreSQL 18 and above declare the volume at /var/lib/postgresql.
+      # For 17 and earlier, mount ./data/db at /var/lib/postgresql/data instead.
+      - ./data/db:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=gatus
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+    networks:
+      - web
+
+  gatus:
+    image: twinproduction/gatus:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=gatus
+    volumes:
+      - ./config:/config
+    networks:
+      - web
+    depends_on:
+      - postgres
+
+networks:
+  web:
