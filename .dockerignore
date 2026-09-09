@@ -1,0 +1,6 @@
+.git
+.github
+infra
+.env
+.env.*
+.DS_Store
