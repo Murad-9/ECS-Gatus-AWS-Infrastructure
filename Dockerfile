@@ -8,6 +8,8 @@ RUN go mod download
 
 COPY app/ .
 
+RUN ls -la /build
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o gatus .
 
 # Create a non-root user
