@@ -10,6 +10,7 @@ module "vpc" {
 module "ecs" {
   source         = "./modules/ecs"
   repository_url = module.ecr.repository_url
+  image_tag = var.image_tag
   vpc_id         = module.vpc.vpc_id
 
   subnet_ids = [

@@ -35,3 +35,9 @@ variable "alb_security_group_id" {
 variable "vpc_id" {
   type = string
 }
+
+
+
+variable "image_tag" {
+  type = string
+}
