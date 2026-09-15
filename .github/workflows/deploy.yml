@@ -48,4 +48,4 @@ jobs:
 
 
           - name: Deploy to ECS
-            run: aws ecs update-service --cluster gatus-ecs-cluster --service gatus-ecs-service --force-new-deployment
+            run: aws ecs update-service --cluster gatus --service gatus-ecs-service --force-new-deployment
