@@ -29,6 +29,20 @@ jobs:
                 aws-region: eu-west-1
 
 
+          - name: Setup Terraform
+            uses: hashicorp/setup-terraform@v3
+
+          - name: Terraform Init
+            working-directory: infra
+            run: terraform init
+
+          - name: Terraform Plan
+            working-directory: infra
+            run: terraform plan
+
+
+
+
           - name: login to ECR
             id: login-ecr
             uses: aws-actions/amazon-ecr-login@v2
