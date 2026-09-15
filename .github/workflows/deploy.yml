@@ -41,6 +41,11 @@ jobs:
             run: terraform plan
 
 
+          - name: Terraform Apply
+            working-directory: infra
+            run: terraform apply -auto-approve
+
+
 
 
           - name: login to ECR
@@ -53,13 +58,11 @@ jobs:
             run: docker build -t gatus-terraform .
 
 
-          - name: tag Docker image
-            run: docker tag gatus-terraform:latest ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:latest
+          - name: Tag Docker image with commit SHA
+            run: docker tag gatus-terraform:latest ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
 
-
-          - name: Push Docker Image
-            run: docker push ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:latest
-
+          - name: Push Docker image with commit SHA
+            run: docker push ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
 
           - name: Deploy to ECS
             run: aws ecs update-service --cluster gatus --service gatus-ecs-service --force-new-deployment
