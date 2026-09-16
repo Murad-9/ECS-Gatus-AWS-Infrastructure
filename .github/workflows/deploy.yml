@@ -1,77 +1,63 @@
 name: Deploy Gatus
 
 on:
-    push:
-        branches:
-            - main
-
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        permissions:
-            id-token: write
-            contents: read
-        steps:
-          - name: checkout code
-            uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
 
-          - name: Debug OIDC claims
-            run: | 
-             echo "Expected sub: repo:${{ github.repository }}:ref:${{ github.ref }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Debug OIDC claims
+        run: |
+          echo "Expected sub: repo:${{ github.repository }}:ref:${{ github.ref }}"
 
-          - name: configure AWS credentials
-            uses: aws-actions/configure-aws-credentials@v4
-            with:
-                role-to-assume: arn:aws:iam::192902842825:role/GitHubActions-Gatus
-                aws-region: eu-west-1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::192902842825:role/GitHubActions-Gatus
+          aws-region: eu-west-1
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-          - name: Setup Terraform
-            uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
 
-          - name: Terraform Init
-            working-directory: infra
-            run: terraform init
+      - name: Create ECR repository
+        working-directory: infra
+        run: terraform apply -auto-approve -target=module.ecr -var="image_tag=${{ github.sha }}"
 
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-          - name: Create ECR repository
-            working-directory: infra
-            run: terraform apply -auto-approve -target=module.ecr -var="image_tag=${{ github.sha }}"
+      - name: Build Docker image
+        run: docker build -t gatus-terraform .
 
+      - name: Tag Docker image with commit SHA
+        run: docker tag gatus-terraform:latest ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
 
+      - name: Push Docker image with commit SHA
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
 
+      - name: Terraform Plan
+        working-directory: infra
+        run: terraform plan -var="image_tag=${{ github.sha }}"
 
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve -var="image_tag=${{ github.sha }}"
 
-          - name: Terraform Plan
-            working-directory: infra
-            run: terraform plan -var="image_tag=${{ github.sha }}"
-
-
-          - name: Terraform Apply
-            working-directory: infra
-            run: terraform apply -auto-approve -var="image_tag=${{ github.sha }}"
-
-
-
-
-          - name: login to ECR
-            id: login-ecr
-            uses: aws-actions/amazon-ecr-login@v2
-
-
-
-          - name: Build Docker image
-            run: docker build -t gatus-terraform .
-
-
-          - name: Tag Docker image with commit SHA
-            run: docker tag gatus-terraform:latest ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
-
-          - name: Push Docker image with commit SHA
-            run: docker push ${{ steps.login-ecr.outputs.registry }}/gatus-terraform:${{ github.sha }}
-
-          - name: Deploy to ECS
-            run: aws ecs update-service --cluster gatus --service gatus-ecs-service --force-new-deployment
+      - name: Deploy to ECS
+        run: aws ecs update-service --cluster gatus --service gatus-ecs-service --force-new-deployment
