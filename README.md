@@ -89,4 +89,4 @@ Docker images are built through GitHub Actions, tagged with the Git commit SHA a
 
 Terraform uses an encrypted Amazon S3 backend with native state locking to store and protect the remote Terraform state. Application logs are sent from ECS to Amazon CloudWatch Logs.
 
-![Gatus AWS Architecture](assets/architecture/GATUS_AWS.jpeg)
+![Gatus AWS Architecture](assets/architecture/gatus_aws.jpeg)
