@@ -75,7 +75,7 @@ This is a portfolio and learning project rather than a production application wi
 
 Because of this, the ECS service currently runs with a desired count of one Fargate task. The Application Load Balancer still spans two Availability Zones, and the ECS service is configured with both public subnets so the task can be placed in either Availability Zone.
 
-If the application needed to support significantly more traffic in the future, the architecture could be extended by increasing the number of ECS tasks and introducing ECS Service Auto Scaling.git 
+If the application needed to support significantly more traffic in the future, the architecture could be extended by increasing the number of ECS tasks and introducing ECS Service Auto Scaling.
 
 
 
@@ -89,4 +89,6 @@ Docker images are built through GitHub Actions, tagged with the Git commit SHA a
 
 Terraform uses an encrypted Amazon S3 backend with native state locking to store and protect the remote Terraform state. Application logs are sent from ECS to Amazon CloudWatch Logs.
 
-![Gatus AWS Architecture](assets/architecture/GATUS_AWS.jpeg)
+<p align="center">
+  <img src="assets/architecture/GATUS_AWS.jpeg" alt="Gatus AWS Architecture" width="100%">
+</p>
