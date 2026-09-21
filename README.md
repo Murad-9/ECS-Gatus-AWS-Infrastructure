@@ -35,3 +35,4 @@ An end-to-end deployment of Gatus on AWS ECS Fargate, provisioned with Terraform
 ![Git](https://img.shields.io/badge/Version_Control-Git-F05032?logo=git&logoColor=white)
 ![VS Code](https://img.shields.io/badge/Editor-VS_Code-007ACC?logo=visualstudiocode&logoColor=white)
 ![YAML](https://img.shields.io/badge/Config-YAML-CB171E?logo=yaml&logoColor=white)
+![AWS CLI](https://img.shields.io/badge/CLI-AWS_CLI-232F3E?logo=amazonaws&logoColor=white)
