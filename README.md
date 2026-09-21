@@ -36,3 +36,43 @@ An end-to-end deployment of Gatus on AWS ECS Fargate, provisioned with Terraform
 ![VS Code](https://img.shields.io/badge/Editor-VS_Code-007ACC?logo=visualstudiocode&logoColor=white)
 ![YAML](https://img.shields.io/badge/Config-YAML-CB171E?logo=yaml&logoColor=white)
 ![AWS CLI](https://img.shields.io/badge/CLI-AWS_CLI-232F3E?logo=amazonaws&logoColor=white)
+
+
+## Project Overview
+
+
+### What is this application?
+
+Gatus is an open-source health monitoring application written in Go. It monitors endpoints such as websites and APIs and displays their availability, response time and health status through a web interface.
+
+For this project, I containerised Gatus using my own multi-stage Dockerfile and deployed it to AWS ECS Fargate. The application runs on port 8080 behind an Application Load Balancer and is accessed through the custom domain `tm.gatuslabs.online` over HTTPS.
+
+The infrastructure is provisioned using Terraform and the deployment process is automated using GitHub Actions. Docker images are built and tagged using the Git commit SHA before being pushed to Amazon ECR and deployed to ECS.
+
+
+### Why did I choose Gatus?
+
+I chose Gatus because it is a lightweight application that works well in a containerised environment while still giving me the opportunity to build a realistic cloud deployment around it.
+
+Rather than focusing mainly on application development, I wanted this project to focus on DevOps skills such as Docker, Terraform, AWS networking, ECS, load balancing, HTTPS, CI/CD and secure authentication.
+
+
+### Why did I host it on ECS?
+
+
+I chose ECS Fargate because I wanted to deploy and manage a containerised application without having to manage the underlying EC2 servers.
+
+Using a traditional virtual machine would mean provisioning the server, installing Docker, managing the operating system and maintaining the instance myself. Fargate allows AWS to manage the underlying compute while I focus on the container, networking and infrastructure configuration.
+
+Services such as Vercel or Netlify would make deployment simpler, but they would abstract away many of the AWS and DevOps concepts that I wanted to practise in this project.
+
+Using ECS allowed me to work directly with services such as ECR, IAM, VPC networking, Application Load Balancers, CloudWatch and Terraform.
+
+
+### 4. How many users am I expecting?
+
+This is a portfolio and learning project rather than a production application with a large user base, so I expect very low traffic.
+
+Because of this, the ECS service currently runs with a desired count of one Fargate task. The Application Load Balancer still spans two Availability Zones, and the ECS service is configured with both public subnets so the task can be placed in either Availability Zone.
+
+If the application needed to support significantly more traffic in the future, the architecture could be extended by increasing the number of ECS tasks and introducing ECS Service Auto Scaling.git 
