@@ -76,3 +76,17 @@ This is a portfolio and learning project rather than a production application wi
 Because of this, the ECS service currently runs with a desired count of one Fargate task. The Application Load Balancer still spans two Availability Zones, and the ECS service is configured with both public subnets so the task can be placed in either Availability Zone.
 
 If the application needed to support significantly more traffic in the future, the architecture could be extended by increasing the number of ECS tasks and introducing ECS Service Auto Scaling.git 
+
+
+
+## Architecture
+
+The infrastructure is deployed in AWS `eu-west-1` using Terraform.
+
+The application runs on Amazon ECS Fargate inside a custom VPC with two public subnets across two Availability Zones. An internet-facing Application Load Balancer distributes traffic to the ECS service, while Route 53 provides DNS and AWS Certificate Manager provides HTTPS.
+
+Docker images are built through GitHub Actions, tagged with the Git commit SHA and pushed to Amazon ECR. ECS then runs the image as a Fargate task.
+
+Terraform uses an encrypted Amazon S3 backend with native state locking to store and protect the remote Terraform state. Application logs are sent from ECS to Amazon CloudWatch Logs.
+
+![Gatus AWS Architecture](assets/architecture/GATUS_AWS.jpeg)
