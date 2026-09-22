@@ -98,7 +98,6 @@ Terraform uses an encrypted Amazon S3 backend with native state locking to store
 
 The repository is organised into separate areas for the application, infrastructure, CI/CD and project documentation.
 
-## Project Structure
 
 ```text
 ECS-Gatus-AWS-Infrastructure/
