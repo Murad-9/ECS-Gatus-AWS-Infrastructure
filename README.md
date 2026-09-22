@@ -98,6 +98,8 @@ Terraform uses an encrypted Amazon S3 backend with native state locking to store
 
 The repository is organised into separate areas for the application, infrastructure, CI/CD and project documentation.
 
+## Project Structure
+
 ```text
 ECS-Gatus-AWS-Infrastructure/
 │
@@ -106,7 +108,11 @@ ECS-Gatus-AWS-Infrastructure/
 │       └── deploy.yml
 │
 ├── app/
-│   └── Gatus application source code
+│   ├── main.go
+│   ├── config.yaml
+│   ├── go.mod
+│   ├── go.sum
+│   └── ...Gatus application source code
 │
 ├── assets/
 │   └── architecture/
@@ -115,11 +121,31 @@ ECS-Gatus-AWS-Infrastructure/
 ├── infra/
 │   ├── modules/
 │   │   ├── acm/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   │
 │   │   ├── alb/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   │
 │   │   ├── ecr/
+│   │   │   ├── main.tf
+│   │   │   └── outputs.tf
+│   │   │
 │   │   ├── ecs/
+│   │   │   ├── main.tf
+│   │   │   └── variables.tf
+│   │   │
 │   │   ├── route53/
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   │
 │   │   └── vpc/
+│   │       ├── main.tf
+│   │       └── outputs.tf
 │   │
 │   ├── backend.tf
 │   ├── main.tf
