@@ -155,6 +155,7 @@ ECS-Gatus-AWS-Infrastructure/
 ├── .gitignore
 └── README.md
 ``` 
+
 - **`app/`** contains the Gatus application source code and configuration.
 - **`infra/`** contains the Terraform configuration and reusable infrastructure modules.
 - **`.github/workflows/`** contains the GitHub Actions CI/CD workflow.
