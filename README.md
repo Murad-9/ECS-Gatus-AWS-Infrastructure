@@ -174,7 +174,7 @@ The build stage uses a Go Alpine image to install dependencies and compile the a
 
 I also run the application as a non-root user instead of root.
 
-Gatus runs on port `8080`, which is the port later used by ECS and the Application Load Balancer.
+Gatus listens on port `8080`. ECS exposes this container port, while the Application Load Balancer receives traffic on ports `80` and `443` and forwards requests through the target group to the ECS task on port `8080`.
 
 ### 2. Building the AWS Network
 
