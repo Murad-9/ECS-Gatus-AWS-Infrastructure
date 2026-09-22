@@ -69,7 +69,7 @@ Services such as Vercel or Netlify would make deployment simpler, but they would
 Using ECS allowed me to work directly with services such as ECR, IAM, VPC networking, Application Load Balancers, CloudWatch and Terraform.
 
 
-###  How many users am I expecting?
+### How many users am I expecting?
 
 This is a portfolio and learning project rather than a production application with a large user base, so I expect very low traffic.
 
@@ -155,12 +155,10 @@ ECS-Gatus-AWS-Infrastructure/
 ├── .gitignore
 └── README.md
 
-app/ contains the Gatus application source code and configuration.
 
-infra/ contains the Terraform configuration and reusable infrastructure modules.
-
-.github/workflows/ contains the GitHub Actions CI/CD workflow.
-
-assets/ contains images used by the README, including the architecture diagram.
-
-Dockerfile contains the multi-stage container build used to package Gatus.
+```markdown
+- **`app/`** contains the Gatus application source code and configuration.
+- **`infra/`** contains the Terraform configuration and reusable infrastructure modules.
+- **`.github/workflows/`** contains the GitHub Actions CI/CD workflow.
+- **`assets/`** contains images used by the README, including the architecture diagram.
+- **`Dockerfile`** contains the multi-stage container build used to package Gatus.
