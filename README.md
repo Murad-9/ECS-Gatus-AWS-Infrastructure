@@ -204,4 +204,4 @@ The ECS service currently uses:
 
 A desired count of `1` means ECS keeps one Gatus task running.
 
-The service is configured with both public subnets, so AWS can place the task in either Availability Zone.
+The service is configured with both public subnets, so AWS can place the task in either Availability Zone..
