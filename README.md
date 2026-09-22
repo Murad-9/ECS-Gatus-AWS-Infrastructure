@@ -161,3 +161,47 @@ ECS-Gatus-AWS-Infrastructure/
 - **`.github/workflows/`** contains the GitHub Actions CI/CD workflow.
 - **`assets/`** contains images used by the README, including the architecture diagram.
 - **`Dockerfile`** contains the multi-stage container build used to package Gatus.
+
+
+
+## Implementation Walkthrough
+
+### 1. Containerising Gatus
+
+I started by creating my own multi-stage Dockerfile for Gatus.
+
+The build stage uses a Go Alpine image to install dependencies and compile the application. The final stage uses a minimal `scratch` image so the runtime container only contains what it needs.
+
+I also run the application as a non-root user instead of root.
+
+Gatus runs on port `8080`, which is the port later used by ECS and the Application Load Balancer.
+
+### 2. Building the AWS Network
+
+I created a custom VPC using the CIDR range `10.0.0.0/16`.
+
+Inside the VPC I created two public subnets across two Availability Zones:
+
+- `10.0.1.0/24` in `eu-west-1a`
+- `10.0.2.0/24` in `eu-west-1b`
+
+Both subnets use a route table with a default route through an Internet Gateway.
+
+For this project I chose public subnets rather than private subnets with a NAT Gateway to keep the architecture simpler and avoid the extra NAT Gateway cost.
+
+The ECS task still isn't directly open on port `8080` because its security group only allows traffic from the ALB security group.
+
+### 3. Deploying with ECS Fargate
+
+I used ECS Fargate to run the Gatus container without having to manage the underlying EC2 instances.
+
+The ECS service currently uses:
+
+- `desired_count = 1`
+- `0.25 vCPU`
+- `512 MiB` memory
+- Port `8080`
+
+A desired count of `1` means ECS keeps one Gatus task running.
+
+The service is configured with both public subnets, so AWS can place the task in either Availability Zone.
