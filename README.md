@@ -154,7 +154,6 @@ ECS-Gatus-AWS-Infrastructure/
 ├── .dockerignore
 ├── .gitignore
 └── README.md
-
 ``` 
 - **`app/`** contains the Gatus application source code and configuration.
 - **`infra/`** contains the Terraform configuration and reusable infrastructure modules.
