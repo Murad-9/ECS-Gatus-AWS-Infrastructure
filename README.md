@@ -218,3 +218,19 @@ The target group uses `ip` as its target type because Fargate tasks use their ow
 I configured the target group to use `/health` for health checks. This allows the ALB to check whether the Gatus task is healthy before sending traffic to it.
 
 The ALB security group allows inbound traffic on ports `80` and `443`, while the ECS security group only allows traffic on port `8080` when it comes from the ALB security group.
+
+
+
+### 5. Adding a Custom Domain and HTTPS
+
+I used Route 53 to connect the custom domain `tm.gatuslabs.online` to the Application Load Balancer.
+
+The Route 53 `A` record is configured as an alias to the ALB, so requests to the domain are sent to the load balancer.
+
+I used AWS Certificate Manager to request an SSL/TLS certificate for `tm.gatuslabs.online`.
+
+The certificate uses DNS validation, and Terraform creates the required Route 53 validation record automatically.
+
+The ALB has an HTTPS listener on port `443` using the ACM certificate. Requests arriving on port `80` are redirected to HTTPS on port `443`.
+
+This means the application can be accessed securely through the custom domain rather than directly through the ALB DNS name.
