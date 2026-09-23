@@ -261,3 +261,20 @@ The certificate uses DNS validation, and Terraform creates the required Route 53
 The ALB has an HTTPS listener on port `443` using the ACM certificate. Requests arriving on port `80` are redirected to HTTPS on port `443`.
 
 This means the application can be accessed securely through the custom domain rather than directly through the ALB DNS name.
+
+
+### 6. Terraform Modules and Remote State
+
+I initially built the Terraform configuration in a single file so I could get the infrastructure working and understand how the resources connected.
+
+Once the deployment was working, I refactored the configuration into separate modules for the VPC, ECS, ECR, Application Load Balancer, Route 53 and ACM.
+
+This made the infrastructure easier to read, maintain and reuse.
+
+The root Terraform configuration connects these modules together by passing outputs between them. For example, the VPC module provides the VPC and subnet IDs required by the ALB and ECS modules, while the ECR module provides the repository URL used by the ECS task definition.
+
+Instead of storing the Terraform state locally, I configured an Amazon S3 remote backend.
+
+The state is stored in the `gatus-ecs-terraform-state` S3 bucket with encryption enabled.
+
+I also enabled native S3 state locking using `use_lockfile = true`. This prevents multiple Terraform processes from changing the same state at the same time, reducing the risk of conflicting changes or state corruption.
