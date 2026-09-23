@@ -40,3 +40,9 @@ jobs:
 
       - name: Show image tag
         run: echo "Image pushed with tag ${{ github.sha }}"
+
+  terraform-deploy:
+    needs: build-and-push
+    uses: ./.github/workflows/terraform-deploy.yaml
+    with:
+      image_tag: ${{ github.sha }}
