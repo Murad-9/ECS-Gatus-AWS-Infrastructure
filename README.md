@@ -278,3 +278,21 @@ Instead of storing the Terraform state locally, I configured an Amazon S3 remote
 The state is stored in the `gatus-ecs-terraform-state` S3 bucket with encryption enabled.
 
 I also enabled native S3 state locking using `use_lockfile = true`. This prevents multiple Terraform processes from changing the same state at the same time, reducing the risk of conflicting changes or state corruption.
+
+
+
+### 7. Automating Deployment with GitHub Actions and OIDC
+
+I automated the deployment process using GitHub Actions.
+
+When changes are pushed to the `main` branch, the workflow checks out the repository, configures AWS credentials, initialises Terraform, builds the Docker image, pushes it to Amazon ECR and applies any required Terraform changes.
+
+Docker images are tagged using the Git commit SHA instead of only using a `latest` tag. This makes it possible to trace a deployed container image back to the exact commit that produced it.
+
+For AWS authentication, I used OpenID Connect (OIDC) rather than storing long-lived AWS access keys as GitHub secrets.
+
+GitHub Actions assumes the `GitHubActions-Gatus` IAM role and receives temporary AWS credentials for the workflow run.
+
+After the Terraform deployment completes, the workflow forces a new ECS service deployment so the latest task definition and container image are used.
+
+README and architecture-only changes are excluded from the deployment trigger, so documentation updates do not unnecessarily rebuild or redeploy the application.
