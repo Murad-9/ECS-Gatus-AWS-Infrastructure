@@ -183,7 +183,7 @@ During the ClickOps stage I worked with services including:
 
 Once I had the application working manually, I removed the manually created resources and rebuilt the infrastructure using reusable Terraform modules.
 
-The final stage was automating the deployment with GitHub Actions so that changes to the application could build a new Docker image, push it to ECR and deploy the updated infrastructure and ECS service.
+The final stage was automating the deployment with GitHub Actions so that changes to the application could build a new Docker image, push it to ECR and apply any required infrastructure changes and deploy the updated ECS service.
 
 This gave me experience with the same architecture through three stages:
 
