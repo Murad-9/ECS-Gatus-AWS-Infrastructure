@@ -163,6 +163,33 @@ ECS-Gatus-AWS-Infrastructure/
 - **`Dockerfile`** contains the multi-stage container build used to package Gatus.
 
 
+## From ClickOps to Infrastructure as Code
+
+Before building the final infrastructure with Terraform, I first deployed the architecture manually through the AWS Console.
+
+This helped me understand how the individual AWS services connected before trying to automate everything.
+
+During the ClickOps stage I worked with services including:
+
+- VPC networking, public subnets, routing and an Internet Gateway
+- Amazon ECR for storing the Docker image
+- Amazon ECS with Fargate
+- ECS task definitions and services
+- Application Load Balancer and target groups
+- Security groups
+- Route 53
+- AWS Certificate Manager for HTTPS
+- CloudWatch logging
+
+Once I had the application working manually, I removed the manually created resources and rebuilt the infrastructure using reusable Terraform modules.
+
+The final stage was automating the deployment with GitHub Actions so that changes to the application could build a new Docker image, push it to ECR and deploy the updated infrastructure and ECS service.
+
+This gave me experience with the same architecture through three stages:
+
+**ClickOps → Terraform → CI/CD**
+
+
 
 ## Implementation Walkthrough
 
