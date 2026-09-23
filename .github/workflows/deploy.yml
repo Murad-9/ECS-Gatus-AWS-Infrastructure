@@ -1,12 +1,13 @@
 name: Deploy Gatus
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "README.md"
-      - "assets/**"
+  workflow_dispatch:
+  #push:
+   # branches:
+    #  - main
+    #paths-ignore:
+     # - "README.md"
+      #- "assets/**"
 
 jobs:
   deploy:
