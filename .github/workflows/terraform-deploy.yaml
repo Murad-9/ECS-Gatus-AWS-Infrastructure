@@ -7,12 +7,23 @@ on:
         required: true
         type: string
 
+      ecr_only:
+        required: false
+        type: boolean
+        default: false
+
   workflow_dispatch:
     inputs:
       image_tag:
         description: "ECR image tag to deploy"
         required: true
         type: string
+
+      ecr_only:
+        description: "Only create the ECR repository"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -43,9 +54,22 @@ jobs:
         working-directory: infra
         run: terraform validate
 
-      - name: Terraform Plan
+      - name: Terraform Plan - ECR Only
+        if: ${{ inputs.ecr_only }}
         working-directory: infra
-        run: terraform plan -var="image_tag=${{ inputs.image_tag }}" -out=tfplan
+        run: |
+          terraform plan \
+            -target=module.ecr \
+            -var="image_tag=${{ inputs.image_tag }}" \
+            -out=tfplan
+
+      - name: Terraform Plan - Full Infrastructure
+        if: ${{ !inputs.ecr_only }}
+        working-directory: infra
+        run: |
+          terraform plan \
+            -var="image_tag=${{ inputs.image_tag }}" \
+            -out=tfplan
 
       - name: Terraform Apply
         working-directory: infra
