@@ -205,3 +205,16 @@ The ECS service currently uses:
 A desired count of `1` means ECS keeps one Gatus task running.
 
 The service is configured with both public subnets, so AWS can place the task in either Availability Zone.
+
+
+### 4. Adding the Application Load Balancer
+
+I added an internet-facing Application Load Balancer across both public subnets to provide a single entry point for the application.
+
+The ALB receives incoming web traffic and forwards it to the ECS task through a target group.
+
+The target group uses `ip` as its target type because Fargate tasks use their own network interfaces and IP addresses. Traffic is forwarded to the Gatus container on port `8080`.
+
+I configured the target group to use `/health` for health checks. This allows the ALB to check whether the Gatus task is healthy before sending traffic to it.
+
+The ALB security group allows inbound traffic on ports `80` and `443`, while the ECS security group only allows traffic on port `8080` when it comes from the ALB security group.
