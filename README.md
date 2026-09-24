@@ -281,6 +281,9 @@ The state is stored in the `gatus-ecs-terraform-state` S3 bucket with encryption
 
 I also enabled native S3 state locking using `use_lockfile = true`. This prevents multiple Terraform processes from changing the same state at the same time, reducing the risk of conflicting changes or state corruption.
 
+The S3 backend bucket is separate from the Terraform-managed application infrastructure. This means `terraform destroy` removes the AWS resources tracked in the state, but it does not remove the backend bucket itself.
+
+The backend remains available so Terraform can continue storing the updated state after the infrastructure has been destroyed. For example, after running the destroy workflow, `terraform state list` returned no managed resources while the S3 backend still remained available.
 
 
 ### 7. Automating Deployment with GitHub Actions and OIDC
