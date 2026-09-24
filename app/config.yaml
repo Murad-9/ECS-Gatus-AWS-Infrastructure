@@ -1,3 +1,4 @@
+#cicd
 endpoints:
   - name: front-end
     group: core
