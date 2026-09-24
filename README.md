@@ -160,7 +160,7 @@ ECS-Gatus-AWS-Infrastructure/
 
 - **`app/`** contains the Gatus application source code and configuration.
 - **`infra/`** contains the Terraform configuration and reusable infrastructure modules.
-- **`.github/workflows/`** contains the GitHub Actions CI/CD workflow.
+- **`.github/workflows/`** contains the GitHub Actions CI/CD workflows.
 - **`assets/`** contains images used by the README, including the architecture diagram.
 - **`Dockerfile`** contains the multi-stage container build used to package Gatus.
 
