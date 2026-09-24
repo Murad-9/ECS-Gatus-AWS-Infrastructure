@@ -319,3 +319,69 @@ Although I could run `terraform destroy` from my local terminal, using GitHub Ac
 The destroy workflow initialises Terraform, creates a destroy plan and then applies that plan to remove the Terraform-managed AWS infrastructure.
 
 Documentation and workflow-only changes do not trigger an application deployment, which prevents unnecessary infrastructure changes and AWS usage.
+
+
+
+## Local Setup
+
+### Prerequisites
+
+To run the application locally, you need:
+
+- Git
+- Docker
+
+To work with the Terraform configuration, you also need:
+
+- Terraform
+- AWS CLI
+- AWS credentials with access to the required AWS resources
+
+### Clone the Repository
+
+```bash
+git clone git@github.com:Murad-9/ECS-Gatus-AWS-Infrastructure.git
+cd ECS-Gatus-AWS-Infrastructure
+```
+
+### Run Gatus Locally with Docker
+
+Build the Docker image from the root of the repository:
+
+```bash
+docker build -t gatus-local .
+```
+
+Run the container:
+
+```bash
+docker run --rm -p 8080:8080 gatus-local
+```
+
+Gatus can then be accessed locally on port `8080`.
+
+### Validate the Terraform Configuration
+
+From the `infra` directory:
+
+```bash
+cd infra
+terraform init
+terraform validate
+```
+
+This project uses an Amazon S3 remote backend, so Terraform connects to the configured backend during initialisation.
+
+### AWS Deployment
+
+The AWS deployment is handled through GitHub Actions rather than requiring the full deployment to be run manually from a local terminal.
+
+Application changes pushed to the `main` branch trigger the Application Deploy workflow. The workflow:
+
+1. Creates the ECR repository through Terraform if required
+2. Builds the Docker image
+3. Tags the image using the Git commit SHA
+4. Pushes the image to Amazon ECR
+5. Runs the full Terraform deployment
+
+The deployment expects the supporting AWS setup to already exist, including the S3 Terraform backend, Route 53 hosted zone and the GitHub OIDC IAM role used by GitHub Actions.
