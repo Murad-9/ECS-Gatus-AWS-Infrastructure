@@ -285,16 +285,37 @@ I also enabled native S3 state locking using `use_lockfile = true`. This prevent
 
 ### 7. Automating Deployment with GitHub Actions and OIDC
 
-I automated the deployment process using GitHub Actions.
+I separated the CI/CD process into three GitHub Actions workflows so that each workflow has a clear responsibility.
 
-When changes are pushed to the `main` branch, the workflow checks out the repository, configures AWS credentials, initialises Terraform, builds the Docker image, pushes it to Amazon ECR and applies any required Terraform changes.
+The `app-deploy.yml` workflow handles the application deployment process. When application files change on the `main` branch, it starts automatically.
 
-Docker images are tagged using the Git commit SHA instead of only using a `latest` tag. This makes it possible to trace a deployed container image back to the exact commit that produced it.
+On a fresh deployment, the workflow first calls the reusable Terraform deployment workflow with `ecr_only` enabled. This creates the Amazon ECR repository before the Docker image is built, so there is somewhere for the image to be pushed.
 
-For AWS authentication, I used OpenID Connect (OIDC) rather than storing long-lived AWS access keys as GitHub secrets.
+The application workflow then builds the Docker image, tags it using the Git commit SHA and pushes it to Amazon ECR.
 
-GitHub Actions assumes the `GitHubActions-Gatus` IAM role and receives temporary AWS credentials for the workflow run.
+Once the image is available in ECR, the application workflow calls `terraform-deploy.yaml` again for the full infrastructure deployment.
 
-After the Terraform deployment completes, the workflow forces a new ECS service deployment so the latest task definition and container image are used.
+The Terraform workflow runs:
 
-README and architecture-only changes are excluded from the deployment trigger, so documentation updates do not unnecessarily rebuild or redeploy the application.
+- `terraform init`
+- `terraform validate`
+- `terraform plan`
+- `terraform apply`
+
+Terraform then provisions the infrastructure through the reusable modules, including the VPC, ECS service, ECR repository, Application Load Balancer, ACM certificate and Route 53 records.
+
+Docker images are tagged using the Git commit SHA instead of only using a `latest` tag. This allows the deployed image to be traced back to the exact Git commit that created it.
+
+For AWS authentication, I use OpenID Connect (OIDC) instead of storing long-lived AWS access keys in GitHub.
+
+GitHub Actions assumes the `GitHubActions-Gatus` IAM role and receives temporary AWS credentials for each workflow run.
+
+I also created a separate `terraform-destroy.yaml` workflow.
+
+The destroy workflow is intentionally manual because infrastructure destruction should not happen automatically when code is pushed.
+
+Although I could run `terraform destroy` from my local terminal, using GitHub Actions makes the destroy process repeatable, documented and visible inside the repository. It also uses the same OIDC authentication process instead of depending on AWS credentials configured on my local machine.
+
+The destroy workflow initialises Terraform, creates a destroy plan and then applies that plan to remove the Terraform-managed AWS infrastructure.
+
+Documentation and workflow-only changes do not trigger an application deployment, which prevents unnecessary infrastructure changes and AWS usage.
