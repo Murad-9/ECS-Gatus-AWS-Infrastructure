@@ -103,10 +103,10 @@ The repository is organised into separate areas for the application, infrastruct
 ECS-Gatus-AWS-Infrastructure/
 │
 ├── .github/
-└── workflows/
-    ├── app-deploy.yml
-    ├── terraform-deploy.yaml
-    └── terraform-destroy.yaml
+    └── workflows/
+        ├── app-deploy.yml
+        ├── terraform-deploy.yaml
+        └── terraform-destroy.yaml
 │
 ├── app/
 │   ├── main.go
