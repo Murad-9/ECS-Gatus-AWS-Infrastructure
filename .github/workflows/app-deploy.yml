@@ -1,6 +1,14 @@
 name: Application Deploy
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "Dockerfile"
+      - ".dockerignore"
+
   workflow_dispatch:
 
 permissions:
@@ -8,7 +16,14 @@ permissions:
   contents: read
 
 jobs:
+  bootstrap-ecr:
+    uses: ./.github/workflows/terraform-deploy.yaml
+    with:
+      image_tag: bootstrap
+      ecr_only: true
+
   build-and-push:
+    needs: bootstrap-ecr
     runs-on: ubuntu-latest
 
     steps:
@@ -46,3 +61,4 @@ jobs:
     uses: ./.github/workflows/terraform-deploy.yaml
     with:
       image_tag: ${{ github.sha }}
+      ecr_only: false
