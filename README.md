@@ -481,3 +481,23 @@ It became especially useful because I could deploy infrastructure through GitHub
 After testing the final destroy workflow, I ran `terraform init` locally to reconnect to the S3 backend and then ran `terraform state list`. The command returned no managed resources, confirming that the Terraform-managed infrastructure had been successfully removed.
 
 This was one of the parts of the project that helped me understand Terraform beyond simply writing `.tf` files. I learnt that managing the lifecycle and state of infrastructure is just as important as creating the resources themselves.
+
+
+
+## Future Improvements
+
+Although the project meets its current requirements, there are several ways I could improve the architecture further.
+
+One improvement would be moving the ECS tasks into private subnets while keeping the Application Load Balancer in public subnets. This would reduce the direct exposure of the application tasks and make the network design closer to a production environment.
+
+I could also increase the ECS desired count from one task to two or more tasks across multiple Availability Zones. This would improve availability and allow the service to continue operating if one task or Availability Zone became unavailable.
+
+Another improvement would be adding ECS Service Auto Scaling so that the number of running tasks could automatically increase or decrease depending on application demand.
+
+For the CI/CD pipeline, I could add a separate pull request workflow that runs checks such as `terraform fmt`, `terraform validate` and `terraform plan` before changes are merged into the `main` branch.
+
+I could also introduce security and quality tools such as Trivy for container image scanning and Checkov or TFLint for Terraform configuration checks.
+
+For monitoring, I could add CloudWatch alarms for conditions such as unhealthy ALB targets, ECS task failures or high resource usage, with notifications through Amazon SNS.
+
+Finally, I could add an ECR lifecycle policy to automatically remove older Docker images and reduce unnecessary storage over time.
