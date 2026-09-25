@@ -414,3 +414,70 @@ The Terraform destroy workflow is manually triggered and removes the Terraform-m
 <p align="center">
   <img src="assets/architecture/screenshots/terraform-destroy.png" alt="Successful Terraform destroy workflow" width="100%">
 </p>
+
+
+## Challenges and Lessons Learned
+
+### GitHub OIDC Trust Policy
+
+One of the first issues I faced was getting GitHub Actions to authenticate with AWS using OIDC.
+
+The workflow was able to request an OIDC token, but AWS was rejecting the `AssumeRoleWithWebIdentity` request because the IAM role trust policy did not correctly match the GitHub repository and branch.
+
+I fixed this by updating the trust policy so that it allowed the `main` branch of this repository.
+
+This helped me understand that OIDC authentication depends on both sides being configured correctly. GitHub can generate the token, but AWS still needs to trust the exact repository and branch that is requesting access.
+
+### Missing Gatus Configuration Inside the Docker Image
+
+At one point, the container was being built successfully but Gatus was not working correctly because `config.yaml` was missing from the image.
+
+I discovered that the file was being excluded by my Git configuration, which meant it was never available during the Docker build in GitHub Actions.
+
+After correcting this, I was able to copy the configuration file into the final image and set `GATUS_CONFIG_PATH` so Gatus could locate it.
+
+This taught me to check the full path from source code to container image rather than assuming that a successful Docker build means every required file is present.
+
+### ALB 503 Caused by an ECS Image Tag Mismatch
+
+At one stage, the Application Load Balancer returned a `503 Service Unavailable` response because there were no healthy ECS tasks behind it.
+
+After checking the ECS task events, I found that the task was failing with a container image pull error. GitHub Actions had pushed the Docker image to ECR using the Git commit SHA, while the ECS task definition was still trying to pull the `latest` tag.
+
+Because the `latest` image did not exist, the ECS task could not start. With no running healthy task in the target group, the ALB had nowhere to route requests and returned a `503`.
+
+I fixed this by passing the Git commit SHA into Terraform as the `image_tag` variable and configuring the ECS task definition to use:
+
+`repository_url:image_tag`
+
+This meant ECS deployed the exact image that GitHub Actions had just pushed.
+
+This helped me understand how a problem in the image deployment process can appear as an ALB error further down the request path.
+
+### Bootstrapping ECR Before Deployment
+
+I also ran into a deployment-order problem with ECR.
+
+The Docker image needed to be pushed to ECR before ECS could deploy it, but the ECR repository itself was managed by Terraform.
+
+To solve this, I made the application workflow call the Terraform workflow first with an `ecr_only` option. This creates the repository before the Docker image is built and pushed.
+
+After the image is available, the workflow calls Terraform again to deploy the full infrastructure.
+
+This was one of the most useful parts of the project because it made me think about dependencies between the CI/CD pipeline and the infrastructure it is deploying.
+
+### Terraform State During Repeated Builds and Destroys
+
+While building the project, I had to destroy and recreate the infrastructure several times as I changed the networking, ECS, load balancer and other parts of the architecture.
+
+This caused problems when the Terraform state did not match what I expected to exist in AWS. At one point I also encountered situations where Terraform reported that there was nothing to destroy even though I had previously created infrastructure.
+
+This made me realise how important Terraform state is. Terraform does not simply look at AWS and decide what to manage. It relies on its state file to keep track of the resources that belong to the configuration.
+
+To make this more reliable, I configured an Amazon S3 remote backend with encryption and native state locking. This meant the state was stored centrally rather than depending on a local state file on my machine.
+
+It became especially useful because I could deploy infrastructure through GitHub Actions, destroy it through a separate GitHub Actions workflow, and still have both workflows using the same Terraform state.
+
+After testing the final destroy workflow, I ran `terraform init` locally to reconnect to the S3 backend and then ran `terraform state list`. The command returned no managed resources, confirming that the Terraform-managed infrastructure had been successfully removed.
+
+This was one of the parts of the project that helped me understand Terraform beyond simply writing `.tf` files. I learnt that managing the lifecycle and state of infrastructure is just as important as creating the resources themselves.
