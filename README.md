@@ -73,7 +73,7 @@ Using ECS allowed me to work directly with services such as ECR, IAM, VPC networ
 
 This is a portfolio and learning project rather than a production application with a large user base, so I expect very low traffic.
 
-Because of this, the ECS service currently runs with a desired count of one Fargate task. The Application Load Balancer still spans two Availability Zones, and the ECS service is configured with both public subnets so the task can be placed in either Availability Zone.
+Because of this, the ECS service is configured with a desired count of one Fargate task. The Application Load Balancer still spans two Availability Zones, and the ECS service is configured with both public subnets so the task can be placed in either Availability Zone.
 
 If the application needed to support significantly more traffic in the future, the architecture could be extended by increasing the number of ECS tasks and introducing ECS Service Auto Scaling.
 
@@ -224,7 +224,7 @@ The ECS task still isn't directly open on port `8080` because its security group
 
 I used ECS Fargate to run the Gatus container without having to manage the underlying EC2 instances.
 
-The ECS service currently uses:
+The ECS service is configured with:
 
 - `desired_count = 1`
 - `0.25 vCPU`
