@@ -388,3 +388,29 @@ Application changes pushed to the `main` branch trigger the Application Deploy w
 5. Runs the full Terraform deployment
 
 The deployment expects the supporting AWS setup to already exist, including the S3 Terraform backend, Route 53 hosted zone and the GitHub OIDC IAM role used by GitHub Actions.
+
+
+
+## App Demo
+
+When deployed, Gatus is available through the custom domain over HTTPS.
+
+<p align="center">
+  <img src="assets/screenshots/app-demo.png" alt="Gatus application running over HTTPS" width="100%">
+</p>
+
+## CI/CD Evidence
+
+The application deployment pipeline was successfully triggered by a push to `main`. The workflow bootstrapped ECR, built and pushed the Docker image, and then deployed the full Terraform infrastructure.
+
+<p align="center">
+  <img src="assets/screenshots/cicd-success.png" alt="Successful GitHub Actions application deployment pipeline" width="100%">
+</p>
+
+## Terraform Destroy
+
+The Terraform destroy workflow is manually triggered and removes the Terraform-managed AWS infrastructure.
+
+<p align="center">
+  <img src="assets/screenshots/terraform-destroy.png" alt="Successful Terraform destroy workflow" width="100%">
+</p>
