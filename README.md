@@ -81,9 +81,9 @@ If the application needed to support significantly more traffic in the future, t
 
 ## Architecture
 
-The infrastructure is deployed in AWS `eu-west-1` using Terraform.
+The infrastructure is configured for AWS `eu-west-1` using Terraform.
 
-The application runs on Amazon ECS Fargate inside a custom VPC with two public subnets across two Availability Zones. An internet-facing Application Load Balancer distributes traffic to the ECS service, while Route 53 provides DNS and AWS Certificate Manager provides HTTPS.
+When deployed, the application runs on Amazon ECS Fargate inside a custom VPC with two public subnets across two Availability Zones. An internet-facing Application Load Balancer distributes traffic to the ECS service, while Route 53 provides DNS and AWS Certificate Manager provides HTTPS.
 
 Docker images are built through GitHub Actions, tagged with the Git commit SHA and pushed to Amazon ECR. ECS then runs the image as a Fargate task.
 
